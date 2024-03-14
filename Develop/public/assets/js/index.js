@@ -7,33 +7,6 @@ let newNoteBtn;
 let clearBtn;
 let noteList;
 
-// Check if the current URL is the notes page
-if (window.location.pathname === '/notes') {
-  // Assign DOM elements
-  noteForm = document.querySelector('.note-form');
-  noteTitle = document.querySelector('.note-title');
-  noteText = document.querySelector('.note-textarea');
-  saveNoteBtn = document.querySelector('.save-note');
-  newNoteBtn = document.querySelector('.new-note');
-  clearBtn = document.querySelector('.clear-btn');
-  noteList = document.querySelector('.list-group');
-
-  // Event listener for saving a note
-  saveNoteBtn.addEventListener('click', handleNoteSave);
-
-  // Event listener for creating a new note
-  newNoteBtn.addEventListener('click', handleNewNoteView);
-
-  // Event listener for clearing the form
-  clearBtn.addEventListener('click', renderActiveNote);
-
-  // Event listener for input events in the note form
-  noteForm.addEventListener('input', handleRenderBtns);
-
-  // Fetch existing notes from the server and render them
-  getAndRenderNotes();
-}
-
 // Function to show an element
 const show = (elem) => {
   elem.style.display = 'inline';
@@ -46,6 +19,7 @@ const hide = (elem) => {
 
 // Function to handle saving a note
 const handleNoteSave = () => {
+  console.log("Save button clicked.");
   const newNote = {
     title: noteTitle.value.trim(),
     text: noteText.value.trim()
@@ -53,48 +27,39 @@ const handleNoteSave = () => {
 
   // Check if the note has both a title and text
   if (newNote.title && newNote.text) {
-    // Save the note to the server
+    // Save the note to the server (assuming saveNote function exists)
     saveNote(newNote).then(() => {
       // Fetch and render updated notes
       getAndRenderNotes();
       // Reset form and buttons
       renderActiveNote();
     });
+  } else {
+    alert('Please enter both a title and text for the note.');
   }
-};
-
-// Function to handle deleting a note
-const handleNoteDelete = (id) => {
-  // Delete the note from the server
-  deleteNote(id).then(() => {
-    // Fetch and render updated notes
-    getAndRenderNotes();
-    // Reset form and buttons
-    renderActiveNote();
-  });
-};
-
-// Function to handle viewing a note
-const handleNoteView = (e) => {
-  e.preventDefault();
-  const noteId = e.target.closest('.list-group-item').dataset.noteId;
-  // Fetch the note details from the server
-  getNoteById(noteId).then((note) => {
-    // Update active note and render it
-    activeNote = note;
-    renderActiveNote();
-  });
 };
 
 // Function to handle creating a new note view
 const handleNewNoteView = () => {
+  console.log("New note button clicked.");
   // Reset active note and form
   activeNote = {};
   renderActiveNote();
 };
 
+// Function to reset form and buttons
+const renderActiveNote = () => {
+  console.log("Clear button clicked.");
+  noteTitle.value = '';
+  noteText.value = '';
+  activeNote = {};
+  hide(saveNoteBtn);
+  hide(clearBtn);
+};
+
 // Function to handle rendering buttons based on form state
 const handleRenderBtns = () => {
+  console.log("Input detected in form.");
   if (!noteTitle.value.trim() || !noteText.value.trim()) {
     hide(saveNoteBtn);
     hide(clearBtn);
@@ -106,6 +71,7 @@ const handleRenderBtns = () => {
 
 // Function to render the list of notes
 const renderNoteList = (notes) => {
+  console.log("Rendering note list:", notes);
   noteList.innerHTML = '';
   notes.forEach((note) => {
     const li = document.createElement('li');
@@ -125,18 +91,35 @@ const renderNoteList = (notes) => {
 
 // Function to fetch and render existing notes
 const getAndRenderNotes = () => {
-  // Fetch notes from the server
+  console.log("Fetching and rendering notes.");
+  // Fetch notes from the server (assuming getNotes function exists)
   getNotes().then(renderNoteList);
 };
 
-// Function to reset form and buttons
-const renderActiveNote = () => {
-  noteTitle.value = '';
-  noteText.value = '';
-  activeNote = {};
-  hide(saveNoteBtn);
-  hide(clearBtn);
-};
+// Check if the current URL is the notes page
+if (window.location.pathname === '/notes') {
+  // Assign DOM elements
+  noteForm = document.querySelector('.note-form');
+  noteTitle = document.querySelector('.note-title');
+  noteText = document.querySelector('.note-textarea');
+  saveNoteBtn = document.querySelector('.save-note');
+  newNoteBtn = document.querySelector('.new-note');
+  clearBtn = document.querySelector('.clear-btn');
+  noteList = document.querySelector('.list-group');
+
+  console.log("DOM elements assigned:", noteForm, noteTitle, noteText, saveNoteBtn, newNoteBtn, clearBtn, noteList);
+
+  // Event listeners for buttons and form input
+  saveNoteBtn.addEventListener('click', handleNoteSave);
+  newNoteBtn.addEventListener('click', handleNewNoteView);
+  clearBtn.addEventListener('click', renderActiveNote);
+  noteForm.addEventListener('input', handleRenderBtns);
+
+  console.log("Event listeners attached.");
+
+  // Fetch existing notes from the server and render them
+  getAndRenderNotes();
+}
 
 // Initial rendering of the note form and buttons
 renderActiveNote();
